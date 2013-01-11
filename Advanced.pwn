@@ -4975,6 +4975,36 @@ strdel(inputtext,strfind(inputtext,"%",true),strfind(inputtext,"%",true)+2);
             GiveMoney(playerid, -500);
             return 1;
         }
+        case 1233:
+        {
+			for(new b = 0; b < sizeof(SBizzInfo); b++)
+			{
+			new Veh = GetPlayerVehicleID(playerid);
+            if(!response) return 1;
+            new litr;
+            new toplivo[MAX_PLAYERS];
+            new cena;
+            litr = strval(inputtext);
+            if(!strlen(inputtext)) return SPD(playerid, 1233, 1, "Покупка топлива", "Введите желаемое количество литров:", "Принять", "Отмена");
+            if(litr < 1 || litr > 100)
+            {
+                SendClientMessage(playerid, COLOR_GREY, "Нельзя купить больше 100 литров");
+                return SPD(playerid, 1233, 1, "Покупка топлива", "Введите желаемое количество литров:", "Принять", "Отмена");
+            }
+			if(SBizzInfo[b][sbLocked] ==1) return SendClientMessage(playerid,COLOR_GRAD1,"Заправка не работает!");
+			if(PlayerInfo[playerid][pCash] < (SBizzInfo[b][sbPriceProd]/200)*litr) return SendClientMessage(playerid,COLOR_GRAD1,"Не достаточно денег!");
+			if(!IsPlayerInAnyVehicle(playerid)) return	SendClientMessage(playerid, COLOR_GRAD2, "Вы не в машине!");
+			SBizzInfo[b][sbTill] += (SBizzInfo[b][sbPriceProd]/200)*litr;
+			SBizzInfo[b][s2bTill] += (SBizzInfo[b][sbPriceProd]/200)*litr;
+			PlayerInfo[playerid][pCash] -= (SBizzInfo[b][sbPriceProd]/200)*litr;
+			SBizzInfo[b][sbProducts] -= litr;
+			toplivo[playerid] = litr;
+			cena = (SBizzInfo[b][sbPriceProd]/200)*3;
+			format(string, sizeof(string), "<< Запас топлива: %d литров >>/n Цена 1 литра: %d", toplivo,cena);
+			Meh3d[Veh] = Create3DTextLabel(string, COLOR_RED, 9999.0, 9999.0, 9999.0, 30.0, 0, 1);
+			Attach3DTextLabelToVehicle(Meh3d[Veh], Veh, 0, 0, 1.5);
+			}
+			        }
     case 1235:
         {
             if(!response) return 1;
@@ -47694,27 +47724,13 @@ else if(strcmp(cmdtext, "/sellprodz", true) == 0)
 		if(PlayerInfo[playerid][pJob] == 2 && PlayerInfo[playerid][pMember] == 0)
 		{
 			if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 525) return SendClientMessage(playerid,COLOR_GREY, "Вы не в машине механика!");
-			if(gcontract[playerid] == 1)
-			{
-				Delete3DTextLabel(Meh3d[Veh]);
-				cenabenza[playerid] = 0;
-				gcontract[playerid] = 0;
-				Mechanics -= 1;
-		 		SendClientMessage(playerid,COLOR_WHITE, "Контракт с заправкой рассторгнут!");
-				return true;
-			}
+			
 			for(new b = 0; b < sizeof(SBizzInfo); b++)
 			{
 				if(PlayerToPoint(10.0, playerid, SBizzInfo[b][sbEntranceX], SBizzInfo[b][sbEntranceY], SBizzInfo[b][sbEntranceZ]) && SBizzInfo[b][sbLocked] == 0)
 				{
 					Delete3DTextLabel(Meh3d[Veh]);
-					gcontract[playerid] = 1;
-					cenabenza[playerid] = SBizzInfo[b][sbPriceProd] / 2;
-					format(string, sizeof(string), "<< 300 литров. Цена: %d вирт >>", cenabenza[playerid]);
-					Meh3d[Veh] = Create3DTextLabel(string, COLOR_RED, 9999.0, 9999.0, 9999.0, 30.0, 0, 1);
-					Attach3DTextLabelToVehicle(Meh3d[Veh], Veh, 0, 0, 1.5);
-					SendClientMessage(playerid,COLOR_GREEN, "Вы подписали контракт с заправкой");
-					Mechanics += 1;
+					SPD(playerid, 1233, 1, "Покупка топлива", "Введите желаемое количество литров:", "Принять", "Отмена");
 				}
 			}
 		}
