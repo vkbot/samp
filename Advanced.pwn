@@ -4477,6 +4477,7 @@ Camtime[playerid] = 1;
     PlayerInfo[playerid][pFermazarobotok] = 0;
 	ResetPlayerWeapons(playerid);
 	duty[playerid] =0;
+	toplivo[playerid] = 0;
 	AutoBusJob[playerid] = 0;
     AutoBusCheck[playerid] = 0;
     AutoBusMoney[playerid] = 0;
@@ -4989,10 +4990,11 @@ strdel(inputtext,strfind(inputtext,"%",true),strfind(inputtext,"%",true)+2);
         switch(listitem)
 		{
 		case 0:
-   {
-   new Veh = GetPlayerVehicleID(playerid);
-   if(PlayerInfo[playerid][pCash] < cenabenzameh[i]) { SendClientMessage(playerid, COLOR_GREY, "Недостаточно средств!"); return true;}
-   if(!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER || GetVehicleModel(Veh) == 481 || GetVehicleModel(Veh) == 509 || GetVehicleModel(Veh) == 510) return SendClientMessage(playerid,COLOR_YELLOW, "Вы не в автомобиле или этот транспорт нельзя заправить.");
+    {
+	if(toplivo[playerid] <= 10) return SendClientMessage(playerid, COLOR_GREY, "У Вас нет топлива!");
+    new Veh = GetPlayerVehicleID(playerid);
+    if(PlayerInfo[playerid][pCash] < cenabenzameh[i]) { SendClientMessage(playerid, COLOR_GREY, "Недостаточно средств!"); return true;}
+    if(!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER || GetVehicleModel(Veh) == 481 || GetVehicleModel(Veh) == 509 || GetVehicleModel(Veh) == 510) return SendClientMessage(playerid,COLOR_YELLOW, "Вы не в автомобиле или этот транспорт нельзя заправить.");
     if(Fuell[Veh] >= 290) return SendClientMessage(playerid,COLOR_GRAD1, "Ваш бак полон");
 	format(string, sizeof(string), "Механик заправил вашу машину на 10 литров за %d вирт.",cenabenzameh[i]);
 	SendClientMessage(playerid, 0x6495EDFF, string);
@@ -5000,18 +5002,15 @@ strdel(inputtext,strfind(inputtext,"%",true),strfind(inputtext,"%",true)+2);
 	SendClientMessage(i, 0x6495EDFF, string);
 	PlayerInfo[playerid][pCash] -= cenabenzameh[i];
 	PlayerInfo[i][pPayCheck] += cenabenzameh[i];
-new benzin = floatround(10+Fuell[Veh]);
+    new benzin = floatround(10+Fuell[Veh]);
 	Fuell[Veh] = benzin;
     if(GetPlayerVehicleID(playerid) == caridhouse[playerid])
 	{
 	PlayerInfo[playerid][pFuelcar] = benzin;
 	}
 	toplivo[playerid] -= 10;
-	Delete3DTextLabel(Meh3d[Veh]);
-	Delete3DTextLabel(Meh3d[Veh]);
     format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d >>",toplivo,cenabenzameh[playerid]);
-    Meh3d[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 30.0, 0, 1);
-    Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(i), 0.0, 0.0, 2.25);
+	Update3DTextLabelText(Meh3d[Veh], COLOR_LIGHTRED, string);
 	return true;
 	}
 	}
@@ -27974,10 +27973,6 @@ public PayDay()
                 	PlayerInfo[i][pPayCheck] += 5500;
 				}
 //==============================================================================
-					if(PlayerInfo[i][pMember] == 0 && PlayerInfo[i][pRank] == 0)
-					{
-       				 PlayerInfo[i][pPayCheck] = 0;
-					}
 					if(PlayerInfo[i][pMember] != 0)
 					{
 					if(FracBank[0][fKazna] <=0)
@@ -28004,7 +27999,6 @@ public PayDay()
 					}
  					PlayerInfo[i][pExp]++;
 					PlayerPlayMusic(i);
-     				new checks = PlayerInfo[i][pPayCheck];
   					format(string, sizeof(string), "~w~PayDay");
 					GameTextForPlayer(i, string, 5000, 1);
 					//-------------------------- Работам -------------------
@@ -28039,10 +28033,10 @@ public PayDay()
     				}
 					format(string, sizeof(string), "*** Счет за телефон: %d вирт",PlayerInfo[i][pMobile]);
 					SendClientMessage(i, COLOR_LIGHTRED, string);
-					format(string, sizeof(string), "- Зарплата %d вирт", checks);
+					format(string, sizeof(string), "- Зарплата %d вирт", PlayerInfo[i][pPayCheck]);
 					SendClientMessage(i, COLOR_WHITE, string);
 					SendClientMessage(i, COLOR_ORANGERED, " ");
-					PlayerInfo[i][pBank] += checks;
+					PlayerInfo[i][pBank] += PlayerInfo[i][pPayCheck];
 					format(string, sizeof(string), "- Текущий баланс: %d вирт", PlayerInfo[i][pBank]);
 					SendClientMessage(i, COLOR_YELLOW2, string);
 			 		PlayerInfo[i][pZakonp] += 1;
@@ -35684,6 +35678,18 @@ else if(strcmp(cmd, "/abalance", true) == 0)
 	    	PayDay();
   			}
 	    	return true;
+	}
+	if(strcmp(cmdtext, "/mypayday", true) == 0)
+	{
+			if(PlayerInfo[playerid][pAdmin] >= 6)
+			for(new i = 0; i < MAX_PLAYERS; i++)
+			{
+			{
+			format(string, sizeof(string), "Моя зарплата: %d",PlayerInfo[playerid][pPayCheck]);
+			SendClientMessage(playerid, COLOR_GRAD1, string);
+  			}
+	    	return true;
+	}
 	}
 if (strcmp("/repaydebt", cmdtext, true) == 0)
 	{
@@ -47744,13 +47750,10 @@ new fueldel = floatround(SBizzInfo[b][sbPriceProd] / 200.0);
 			PlayerInfo[i][pCash] -= fueldel*litr;
 			SBizzInfo[b][sbProducts] -= litr;
 			toplivo[i] += litr;
-	Delete3DTextLabel(Meh3d[Veh]);
-	Delete3DTextLabel(Meh3d[Veh]);
-	Delete3DTextLabel(Meh3d[Veh]);
 			cenabenzameh[i] = (SBizzInfo[b][sbPriceProd]/20)*3;
             format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d >>",toplivo,cenabenzameh[i]);
-            Meh3d[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 30.0, 0, 1);
-            Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(i), 0.0, 0.0, 2.25);
+            Meh3d[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 10.0, 0, 1);
+            Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(i), 0.0, 0.0, 0);
 			return 1;
 			}
 			}
@@ -56498,7 +56501,7 @@ else if(strcmp(x_job,"debt",true) == 0)
 else if(strcmp(cmd, "/refill", true) == 0)
 	{
 		    if(PlayerInfo[playerid][pJob] != 2) return    SendClientMessage(playerid, COLOR_GREY, "Вы не механик!");
-		    if(toplivo[playerid] <= 0) return SendClientMessage(playerid, COLOR_GREY, "У Вас нет топлива!");
+		    if(toplivo[playerid] <= 9) return SendClientMessage(playerid, COLOR_GREY, "У Вас нет топлива!");
 		    tmp = strtok(cmdtext, idx);
 		    new playa;
 			playa = ReturnUser(tmp);
