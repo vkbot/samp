@@ -4997,15 +4997,16 @@ strdel(inputtext,strfind(inputtext,"%",true),strfind(inputtext,"%",true)+2);
 	format(string, sizeof(string), "Механик заправил вашу машину на 10 литров за %d вирт.",cenabenzameh[playerid]);
 	SendClientMessage(playerid, 0x6495EDFF, string);
 	format(string, sizeof(string), "Вы заправили машину на 10 литров за %d вирт.",cenabenzameh[playerid]);
-	SendClientMessage(RefillOffer[playerid], 0x6495EDFF, string);
+	SendClientMessage(i, 0x6495EDFF, string);
 	PlayerInfo[playerid][pCash] -= cenabenzameh[playerid];
-	PlayerInfo[RefillOffer[i]][pPayCheck] += cenabenzameh[playerid];
-	Fuell[Veh] += 10;
+	PlayerInfo[i][pPayCheck] += cenabenzameh[playerid];
+new benzin = floatround(10+Fuell[Veh]);
+	Fuell[Veh] = benzin;
     if(GetPlayerVehicleID(playerid) == caridhouse[playerid])
 	{
-	PlayerInfo[playerid][pFuelcar] += 10;
+	PlayerInfo[playerid][pFuelcar] = benzin;
 	}
-	toplivo[playerid] -= litr;
+	toplivo[playerid] -= 10;
 	Delete3DTextLabel(Meh3d[Veh]);
 	Delete3DTextLabel(Meh3d[Veh]);
     format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d >>",toplivo,cenabenzameh[playerid]);
@@ -47744,7 +47745,7 @@ new fueldell = floatround(SBizzInfo[b][sbPriceProd] / 20.0);
 			SBizzInfo[b][s2bTill] += fueldel*litr;
 			PlayerInfo[playerid][pCash] -= fueldel*litr;
 			SBizzInfo[b][sbProducts] -= litr;
-			toplivo[playerid] = litr;
+			toplivo[playerid] += litr;
 	Delete3DTextLabel(Meh3d[Veh]);
 	Delete3DTextLabel(Meh3d[Veh]);
 	Delete3DTextLabel(Meh3d[Veh]);
