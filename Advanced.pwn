@@ -27058,7 +27058,7 @@ CreateObject(6046, 1304.42, -1750.65, 13.37,   0.00, 0.00, 180.00);
  	new string[200];
  		Fuell[Vehicles] = 30+random(170);
  		vehcreat[Vehicles] = 0;
-        format(string,sizeof(string),"%d Dream RP %d",100+random(800000),100+random(800000));
+        format(string,sizeof(string),"%d-DRP-%d",1+random(10),1+random(100));
  		SetVehicleNumberPlate(Vehicles, string);
   	}
 	return 1;
@@ -47745,8 +47745,8 @@ new fueldel = floatround(SBizzInfo[b][sbPriceProd] / 200.0);
 			toplivo[i] += litr;
 			cenabenzameh[i] = (SBizzInfo[b][sbPriceProd]/20)*3;
             format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d >>",toplivo,cenabenzameh[i]);
-            Meh3d[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 20.0, 0, 1);
-            Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(i), 0.0, 0.0, 0);
+            Meh3d[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 40.0, 0, 1);
+            Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(i), 0.0, 0.0, 2);
 			return 1;
 			}
 			}
@@ -56625,7 +56625,7 @@ else if(strcmp(cmd, "/changehouse", true) == 0)
 		cenaremonta[playerid] = money;
             format(string, 90, "{FF0000}\n\n<< Цена ремонта: %d >>",cenaremonta[playerid]);
             Meh3d1[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 20.0, 0, 1);
-            Attach3DTextLabelToVehicle(Meh3d1[Veh], GetPlayerVehicleID(playerid), 0.0, 0.0, 0);
+            Attach3DTextLabelToVehicle(Meh3d1[Veh], GetPlayerVehicleID(playerid), 0.0, 0.0, 2);
 			return 1;
    }	
 else if(strcmp(cmd, "/repair", true) == 0)
