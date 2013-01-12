@@ -5013,6 +5013,10 @@ strdel(inputtext,strfind(inputtext,"%",true),strfind(inputtext,"%",true)+2);
         {
 			for(new b = 0; b < sizeof(SBizzInfo); b++)
 			{
+            if(SBizzInfo[b][sbProducts] <= litr) return SendClientMessage(playerid,COLOR_GRAD1,"На заправке нет топлива");
+			if(SBizzInfo[b][sbLocked] == 1) return SendClientMessage(playerid,COLOR_GRAD1,"Заправка не работает!");
+			if(PlayerInfo[playerid][pCash] < (SBizzInfo[b][sbPriceProd]/200)*litr) return SendClientMessage(playerid,COLOR_GRAD1,"Не достаточно денег!");
+			if(!IsPlayerInAnyVehicle(playerid)) return	SendClientMessage(playerid, COLOR_GRAD2, "Вы не в машине!");
 			new Veh = GetPlayerVehicleID(playerid);
             if(!response) return 1;
             litr = strval(inputtext);
@@ -5022,18 +5026,18 @@ strdel(inputtext,strfind(inputtext,"%",true),strfind(inputtext,"%",true)+2);
                 SendClientMessage(playerid, COLOR_GREY, "Нельзя купить больше 100 литров");
                 return SPD(playerid, 1233, 1, "Покупка топлива", "Введите желаемое количество литров:", "Принять", "Отмена");
             }
-            if(SBizzInfo[b][sbProducts] <= litr) return SendClientMessage(playerid,COLOR_GRAD1,"На заправке нет топлива");
-			if(SBizzInfo[b][sbLocked] == 0) return SendClientMessage(playerid,COLOR_GRAD1,"Заправка не работает!");
-			if(PlayerInfo[playerid][pCash] < (SBizzInfo[b][sbPriceProd]/200)*litr) return SendClientMessage(playerid,COLOR_GRAD1,"Не достаточно денег!");
-			if(!IsPlayerInAnyVehicle(playerid)) return	SendClientMessage(playerid, COLOR_GRAD2, "Вы не в машине!");
 			SBizzInfo[b][sbTill] += (SBizzInfo[b][sbPriceProd]/200)*litr;
 			SBizzInfo[b][s2bTill] += (SBizzInfo[b][sbPriceProd]/200)*litr;
 			PlayerInfo[playerid][pCash] -= (SBizzInfo[b][sbPriceProd]/200)*litr;
 			SBizzInfo[b][sbProducts] -= litr;
 			toplivo[playerid] = litr;
 			cenabenzameh[playerid] = (SBizzInfo[b][sbPriceProd]/20)*3;
-			format(string, sizeof(string), "<< Запас топлива: %d литров >>/n Цена 10 литров: %d", toplivo,cenabenzameh[playerid]);
+			format(string, sizeof(string), "Цена на заправке:%d Делим на 20:%d Умножаем на 3:%d",SBizzInfo[b][sbPriceProd],SBizzInfo[b][sbPriceProd]/20,(SBizzInfo[b][sbPriceProd]/200)*3);
+			SendClientMessage(playerid, COLOR_GRAD2, string);
+			format(string, sizeof(string), "<< Запас топлива: %d литров >>", toplivo);
 			Meh3d[Veh] = Create3DTextLabel(string, COLOR_RED, 9999.0, 9999.0, 9999.0, 30.0, 0, 1);
+			format(string, sizeof(string), "<< Цена 10 литров: %d >> ",cenabenzameh[playerid]);
+			Meh3d[Veh] = Create3DTextLabel(string, COLOR_RED, 9999.0, 9999.0, 9900.0, 30.0, 0, 1);
 			Attach3DTextLabelToVehicle(Meh3d[Veh], Veh, 0, 0, 1.5);
 			}
 			        }
@@ -47756,14 +47760,28 @@ else if(strcmp(cmdtext, "/sellprodz", true) == 0)
 			if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 525) return SendClientMessage(playerid,COLOR_GREY, "Вы не в машине механика!");
 			for(new b = 0; b < sizeof(SBizzInfo); b++)
 			{
-				if(PlayerToPoint(10.0, playerid, SBizzInfo[b][sbEntranceX], SBizzInfo[b][sbEntranceY], SBizzInfo[b][sbEntranceZ]) && SBizzInfo[b][sbLocked] == 0)
+				if(PlayerToPoint(10.0, playerid, SBizzInfo[b][sbEntranceX], SBizzInfo[b][sbEntranceY], SBizzInfo[b][sbEntranceZ]))
 				{
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
+					Delete3DTextLabel(Meh3d[Veh]);
 					Delete3DTextLabel(Meh3d[Veh]);
 					SPD(playerid, 1233, 1, "Покупка топлива", "Введите желаемое количество литров:", "Принять", "Отмена");
 				}
 				else
 				{
 				SendClientMessage(playerid,COLOR_RED,"Вы далеко от заправки или же она не работает");
+				return 1;
 				}
 			}
 		}
@@ -47790,7 +47808,7 @@ fueldelll = fueldel*fueldell;
 				}
 				if(SBizzInfo[b][sbLocked] ==1) return SendClientMessage(playerid,COLOR_GRAD1,"Заправка закрыта!");
 				if(Fuell[vehicleid] >=200) return SendClientMessage(playerid,COLOR_GRAD1,"Бак заполнен, удачной поездки!");
-				if(PlayerInfo[playerid][pCash] < SBizzInfo[b][sbPriceProd]) return SendClientMessage(playerid,COLOR_GRAD1,"Не достаточно денег!");
+				if(PlayerInfo[playerid][pCash] < fueldelll) return SendClientMessage(playerid,COLOR_GRAD1,"Не достаточно денег!");
     			if(!IsPlayerInAnyVehicle(playerid)) return	SendClientMessage(playerid, COLOR_GRAD2, "Вы не в машине!");
 				SBizzInfo[b][sbTill] += fueldelll;
 				SBizzInfo[b][s2bTill] += fueldelll;
