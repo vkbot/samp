@@ -17715,10 +17715,7 @@ verent[playerid] = 0;
 Pursiut[playerid] = -1;
 			OnPlayerUpdateRL(playerid);
 			smg[playerid] = 0;
-
-
-
-			if(PlayerInfo[playerid][pJob]  ==2)
+			if(PlayerInfo[playerid][pJob] == 2)
 			{
 			Delete3DTextLabel(Meh3d[GetPlayerVehicleID(playerid)]);
 			Delete3DTextLabel(Meh3d1[GetPlayerVehicleID(playerid)]);
@@ -56615,7 +56612,7 @@ else if(strcmp(cmd, "/changehouse", true) == 0)
     new Veh = GetPlayerVehicleID(playerid);
 		if(PlayerInfo[playerid][pJob] != 2) return SendClientMessage(playerid, COLOR_GREY, "Вы не механик!");
 		tmp = strtok(cmdtext, idx);
-		if(!strlen(tmp)) return	SendClientMessage(playerid, COLOR_GRAD2, "Введите: /repair [цена]");
+		if(!strlen(tmp)) return	SendClientMessage(playerid, COLOR_GRAD2, "Введите: /setrepair [цена]");
 		money = strval(tmp);
 		if(money < 50 || money > 1000)
 		{
@@ -56632,17 +56629,9 @@ else if(strcmp(cmd, "/repair", true) == 0)
 	{
 		if(PlayerInfo[playerid][pJob] != 2) return SendClientMessage(playerid, COLOR_GREY, "Вы не механик!");
 		tmp = strtok(cmdtext, idx);
-		if(!strlen(tmp)) return	SendClientMessage(playerid, COLOR_GRAD2, "Введите: /repair [id] [цена]");
+		if(!strlen(tmp)) return	SendClientMessage(playerid, COLOR_GRAD2, "Введите: /repair [id]");
 		new playa;
-		new money;
 		playa = ReturnUser(tmp);
-		tmp = strtok(cmdtext, idx);
-		money = strval(tmp);
-		if(money < 50 || money > 10000)
-		{
-			SendClientMessage(playerid, COLOR_GREY, "Нельзя меньше 50, и больше 10000 вирт!");
-			return true;
-		}
 		if(IsPlayerConnected(playa))
 		{
 			if(playa != INVALID_PLAYER_ID)
@@ -56657,12 +56646,12 @@ else if(strcmp(cmd, "/repair", true) == 0)
 					}
 					GetPlayerName(playa, giveplayer, sizeof(giveplayer));
 					GetPlayerName(playerid, sendername, sizeof(sendername));
-					format(string, sizeof(string), "Вы предложили %s отремонтировать его машину за %d вирт.",giveplayer,money);
+					format(string, sizeof(string), "Вы предложили %s отремонтировать его машину за %d вирт.",giveplayer,cenaremonta[playerid]);
 					SendClientMessage(playerid, 0x6495EDFF, string);
-					format(string, sizeof(string), "Механик %s предлагает отремонтировать ваш автомобиль за %d вирт.(Введите /accept repair),чтобы совершить починку.",sendername,money);
+					format(string, sizeof(string), "Механик %s предлагает отремонтировать ваш автомобиль за %d вирт.(Введите /accept repair),чтобы совершить починку.",sendername,cenaremonta[playerid]);
 					SendClientMessage(playa, 0x6495EDFF, string);
 					RepairOffer[playa] = playerid;
-					RepairPrice[playa] = money;
+					RepairPrice[playa] = cenaremonta[playerid];
 				}
 				else
 				{
