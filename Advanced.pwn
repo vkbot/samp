@@ -5001,17 +5001,16 @@ strdel(inputtext,strfind(inputtext,"%",true),strfind(inputtext,"%",true)+2);
 	PlayerInfo[playerid][pCash] -= cenabenzameh[playerid];
 	PlayerInfo[RefillOffer[i]][pPayCheck] += cenabenzameh[playerid];
 	Fuell[Veh] += 10;
+    if(GetPlayerVehicleID(playerid) == caridhouse[playerid])
+	{
+	PlayerInfo[playerid][pFuelcar] += 10;
+	}
 	toplivo[playerid] -= litr;
 	Delete3DTextLabel(Meh3d[Veh]);
-	Delete3DTextLabel(Meh3d1[Veh]);
 	Delete3DTextLabel(Meh3d[Veh]);
-	Delete3DTextLabel(Meh3d1[Veh]);
-	format(string, sizeof(string), "<< Запас топлива: %d литров >>", toplivo);
-	Meh3d[Veh] = Create3DTextLabel(string, COLOR_RED, 9999.0, 9999.0, 9999.0, 30.0, 0, 1);
-	Attach3DTextLabelToVehicle(Meh3d[Veh], Veh, 0, 0, 1.5);
-	format(string, sizeof(string), "<< Цена 10 литров: %d >> ",cenabenzameh[playerid]);
-	Meh3d1[Veh] = Create3DTextLabel(string, COLOR_RED, 9999.0, 9999.0, 95.0, 30.0, 0, 1);
-	Attach3DTextLabelToVehicle(Meh3d1[Veh], Veh, 0, 0, 1.5);
+    format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d >>",toplivo,cenabenzameh[playerid]);
+    Meh3d[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 30.0, 0, 1);
+    Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(playerid), 0.0, 0.0, 2.25);
 	return true;
 	}
 	}
@@ -47722,8 +47721,10 @@ else if(strcmp(cmdtext, "/sellprodz", true) == 0)
 	}
 	else if(strcmp(cmd, "/mcontract", true) == 0)
 	{
-			for(new b = 0; b < sizeof(SBizzInfo); b++)
+ 		for(new b = 0; b < sizeof(SBizzInfo); b++)
 			{
+    if(PlayerToPoint(10.0, playerid, SBizzInfo[b][sbEntranceX], SBizzInfo[b][sbEntranceY], SBizzInfo[b][sbEntranceZ]))
+				{
 	tmp = strtok(cmdtext, idx);
         if(!strlen(tmp)) return SendClientMessage(playerid, COLOR_GRAD2, " Используйте: /mcontract [кол-во литров]");
         litr = strval(tmp);
@@ -47744,16 +47745,17 @@ new fueldell = floatround(SBizzInfo[b][sbPriceProd] / 20.0);
 			PlayerInfo[playerid][pCash] -= fueldel*litr;
 			SBizzInfo[b][sbProducts] -= litr;
 			toplivo[playerid] = litr;
+	Delete3DTextLabel(Meh3d[Veh]);
+	Delete3DTextLabel(Meh3d[Veh]);
+	Delete3DTextLabel(Meh3d[Veh]);
 			cenabenzameh[playerid] = (SBizzInfo[b][sbPriceProd]/20)*3;
 			format(string, sizeof(string), "Цена на заправке:%d Делим на 20:%d Умножаем на 3:%d",SBizzInfo[b][sbPriceProd],fueldell,fueldell*3);
 			SendClientMessage(playerid, COLOR_GRAD2, string);
-			format(string, sizeof(string), "<< Запас топлива: %d литров >>", toplivo);
-			Meh3d[Veh] = Create3DTextLabel(string, COLOR_RED, 9999.0, 9999.0, 9999.0, 30.0, 0, 1);
-			Attach3DTextLabelToVehicle(Meh3d[Veh], Veh, 0, 0, 1.5);
-			format(string, sizeof(string), "<< Цена 10 литров: %d >> ",cenabenzameh[playerid]);
-			Meh3d1[Veh] = Create3DTextLabel(string, COLOR_RED, 9999.0, 9999.0, 95.0, 30.0, 0, 1);
-			Attach3DTextLabelToVehicle(Meh3d1[Veh], Veh, 0, 0, 1.5);
+            format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d >>",toplivo,cenabenzameh[playerid]);
+            Meh3d[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 30.0, 0, 1);
+            Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(playerid), 0.0, 0.0, 2.25);
 			return 1;
+			}
 			}
 			}
 	}
