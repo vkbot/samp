@@ -1253,7 +1253,6 @@ new smssf = 0;
 new smsls = 0;
 new smslv = 0;
 new mask[MAX_PLAYERS];
-new gcontract[MAX_PLAYERS];
 new cenabenzameh[MAX_PLAYERS];
 new CountOnZone[MAX_PLAYERS];
 new Text3D:foods[6];
@@ -4992,14 +4991,15 @@ strdel(inputtext,strfind(inputtext,"%",true),strfind(inputtext,"%",true)+2);
 		case 0:
    {
    new Veh = GetPlayerVehicleID(playerid);
+   if(PlayerInfo[playerid][pCash] < cenabenzameh[i]) { SendClientMessage(playerid, COLOR_GREY, "Недостаточно средств!"); return true;}
    if(!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER || GetVehicleModel(Veh) == 481 || GetVehicleModel(Veh) == 509 || GetVehicleModel(Veh) == 510) return SendClientMessage(playerid,COLOR_YELLOW, "Вы не в автомобиле или этот транспорт нельзя заправить.");
     if(Fuell[Veh] >= 290) return SendClientMessage(playerid,COLOR_GRAD1, "Ваш бак полон");
-	format(string, sizeof(string), "Механик заправил вашу машину на 10 литров за %d вирт.",cenabenzameh[playerid]);
+	format(string, sizeof(string), "Механик заправил вашу машину на 10 литров за %d вирт.",cenabenzameh[i]);
 	SendClientMessage(playerid, 0x6495EDFF, string);
-	format(string, sizeof(string), "Вы заправили машину на 10 литров за %d вирт.",cenabenzameh[playerid]);
+	format(string, sizeof(string), "Вы заправили машину на 10 литров за %d вирт.",cenabenzameh[i]);
 	SendClientMessage(i, 0x6495EDFF, string);
-	PlayerInfo[playerid][pCash] -= cenabenzameh[playerid];
-	PlayerInfo[i][pPayCheck] += cenabenzameh[playerid];
+	PlayerInfo[playerid][pCash] -= cenabenzameh[i];
+	PlayerInfo[i][pPayCheck] += cenabenzameh[i];
 new benzin = floatround(10+Fuell[Veh]);
 	Fuell[Veh] = benzin;
     if(GetPlayerVehicleID(playerid) == caridhouse[playerid])
@@ -5011,7 +5011,7 @@ new benzin = floatround(10+Fuell[Veh]);
 	Delete3DTextLabel(Meh3d[Veh]);
     format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d >>",toplivo,cenabenzameh[playerid]);
     Meh3d[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 30.0, 0, 1);
-    Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(playerid), 0.0, 0.0, 2.25);
+    Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(i), 0.0, 0.0, 2.25);
 	return true;
 	}
 	}
@@ -5034,6 +5034,8 @@ new benzin = floatround(10+Fuell[Veh]);
         }
 case 1236:
         {
+        for(new i=0;i<MAX_PLAYERS;i++)
+		{
             if(!response) return 1;
             new name[35];
             new sendername[MAX_PLAYER_NAME];
@@ -5052,7 +5054,8 @@ case 1236:
             ProxDetector(30.0, playerid, string, COLOR_PURPLE,COLOR_PURPLE,COLOR_PURPLE,COLOR_PURPLE,COLOR_PURPLE);
             format(string, 90, "%s\n<< Стоимость проезда: %i долларов >>", name,PriceBus);
             BusText3D[playerid] = Create3DTextLabel(string, COLOR_GREEN, 0.0, 0.0, 0.0, 50.0, 0, 1);
-            Attach3DTextLabelToVehicle(BusText3D[playerid], GetPlayerVehicleID(playerid), 0.0, 0.0, 2.25);
+            Attach3DTextLabelToVehicle(BusText3D[i], GetPlayerVehicleID(i), 0.0, 0.0, 2.25);
+            }
             pPressed[playerid] = 0;
             new i = pPressed[playerid], type = GetPVarInt(playerid, "TypeBus");
             if(type == 1) SetPlayerRaceCheckpoint(playerid,0,BusCityLS[i][0],BusCityLS[i][1],BusCityLS[i][2],BusCityLS[i][3],BusCityLS[i][4],BusCityLS[i][5],5.0);
@@ -41579,7 +41582,7 @@ else if(strcmp(cmd, "/bigears", true) == 0 && PlayerInfo[playerid][pAdmin] == 8)
 
         		tmp = strtok(cmdtext, idx);
         		if(strlen(tmp) == 0)
-					return SendClientMessage(playerid, COLOR_SYSTEM, " Команда: /gcontract [id]");
+					return SendClientMessage(playerid, COLOR_SYSTEM, " Команда: /gcontracts [id]");
 				new pregid = strval(tmp);
 				//if (PlayerInfo[pregid][pLogginet] == 1)
 				//{
@@ -41594,7 +41597,7 @@ else if(strcmp(cmd, "/bigears", true) == 0 && PlayerInfo[playerid][pAdmin] == 8)
 
 				new name[35];
    				GetPlayerName(playerid, name, sizeof(name));
-   				format(string, sizeof(string), "%s предлагает вам контракт 50$ за мешок.\nХотите принять?",name);
+   				format(string, sizeof(string), "%s предлагает вам контракт 60$ за мешок.\nХотите принять?",name);
 				Prorab[pregid] = playerid;
 				ShowPlayerDialog(pregid,9955,DIALOG_STYLE_MSGBOX,"Контракт",string,"Да","Нет");
 
@@ -44880,11 +44883,6 @@ else if(strcmp(cmd, "/goto", true) == 0 || strcmp(cmd, "/g", true) == 0)
 						PlayerInfo[playerid][pCash] -=SBizzInfo[b][sbPriceProd]/4;
 						return true;
 					}
-					else
-					{
-						SendClientMessage(playerid,COLOR_GREY, "Вы не на заправке!");
-						return true;
-					}
 				}
 			}
 			else if(strcmp(x_job, "drugs",true) == 0)
@@ -47724,38 +47722,37 @@ else if(strcmp(cmdtext, "/sellprodz", true) == 0)
 	{
  		for(new b = 0; b < sizeof(SBizzInfo); b++)
 			{
-    if(PlayerToPoint(10.0, playerid, SBizzInfo[b][sbEntranceX], SBizzInfo[b][sbEntranceY], SBizzInfo[b][sbEntranceZ]))
+			for(new i=0;i<MAX_PLAYERS;i++)
+		{
+    if(PlayerToPoint(10.0, i, SBizzInfo[b][sbEntranceX], SBizzInfo[b][sbEntranceY], SBizzInfo[b][sbEntranceZ]))
 				{
 	tmp = strtok(cmdtext, idx);
-        if(!strlen(tmp)) return SendClientMessage(playerid, COLOR_GRAD2, " Используйте: /mcontract [кол-во литров]");
+        if(!strlen(tmp)) return SendClientMessage(i, COLOR_GRAD2, " Используйте: /mcontract [кол-во литров]");
         litr = strval(tmp);
-	if(PlayerInfo[playerid][pJob] == 2 && PlayerInfo[playerid][pMember] == 0)
+	if(PlayerInfo[i][pJob] == 2 && PlayerInfo[i][pMember] == 0)
 		{
 		new Veh = GetPlayerVehicleID(playerid);
 new fueldel = floatround(SBizzInfo[b][sbPriceProd] / 200.0);
-new fueldell = floatround(SBizzInfo[b][sbPriceProd] / 20.0);
-            if(SBizzInfo[b][sbProducts] <= litr) return SendClientMessage(playerid,COLOR_GRAD1,"На заправке нет топлива");
-			if(PlayerInfo[playerid][pCash] < (SBizzInfo[b][sbPriceProd]/200)*litr) return SendClientMessage(playerid,COLOR_GRAD1,"Не достаточно денег!");
-			if(!IsPlayerInAnyVehicle(playerid)) return	SendClientMessage(playerid, COLOR_GRAD2, "Вы не в машине!");
+            if(SBizzInfo[b][sbProducts] <= litr) return SendClientMessage(i,COLOR_GRAD1,"На заправке нет топлива");
+			if(PlayerInfo[i][pCash] < (SBizzInfo[b][sbPriceProd]/200)*litr) return SendClientMessage(i,COLOR_GRAD1,"Не достаточно денег!");
+			if(!IsPlayerInAnyVehicle(i)) return	SendClientMessage(i, COLOR_GRAD2, "Вы не в машине!");
             if(litr < 1 || litr > 100)
             {
-                SendClientMessage(playerid, COLOR_GREY, "Нельзя купить больше 100 литров");
+                SendClientMessage(i, COLOR_GREY, "Нельзя купить больше 100 литров");
             }
-			SBizzInfo[b][sbTill] += fueldel*litr;
 			SBizzInfo[b][s2bTill] += fueldel*litr;
-			PlayerInfo[playerid][pCash] -= fueldel*litr;
+			PlayerInfo[i][pCash] -= fueldel*litr;
 			SBizzInfo[b][sbProducts] -= litr;
-			toplivo[playerid] += litr;
+			toplivo[i] += litr;
 	Delete3DTextLabel(Meh3d[Veh]);
 	Delete3DTextLabel(Meh3d[Veh]);
 	Delete3DTextLabel(Meh3d[Veh]);
-			cenabenzameh[playerid] = (SBizzInfo[b][sbPriceProd]/20)*3;
-			format(string, sizeof(string), "Цена на заправке:%d Делим на 20:%d Умножаем на 3:%d",SBizzInfo[b][sbPriceProd],fueldell,fueldell*3);
-			SendClientMessage(playerid, COLOR_GRAD2, string);
-            format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d >>",toplivo,cenabenzameh[playerid]);
+			cenabenzameh[i] = (SBizzInfo[b][sbPriceProd]/20)*3;
+            format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d >>",toplivo,cenabenzameh[i]);
             Meh3d[Veh] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 30.0, 0, 1);
-            Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(playerid), 0.0, 0.0, 2.25);
+            Attach3DTextLabelToVehicle(Meh3d[Veh], GetPlayerVehicleID(i), 0.0, 0.0, 2.25);
 			return 1;
+			}
 			}
 			}
 			}
@@ -56626,9 +56623,9 @@ else if(strcmp(cmd, "/repair", true) == 0)
 		playa = ReturnUser(tmp);
 		tmp = strtok(cmdtext, idx);
 		money = strval(tmp);
-		if(money < 1 || money > 10000)
+		if(money < 50 || money > 10000)
 		{
-			SendClientMessage(playerid, COLOR_GREY, "Нельзя меньше 1, и больше 10000 вирт!");
+			SendClientMessage(playerid, COLOR_GREY, "Нельзя меньше 50, и больше 10000 вирт!");
 			return true;
 		}
 		if(IsPlayerConnected(playa))
@@ -59563,7 +59560,7 @@ public CreateVehicles() //Машины сервера
 	ambu[4] = AddStaticVehicleEx(416,-2617.8972,621.3510,14.6023,89.8205,1,3,900); // Ambulance 4
 	ambu[5] = AddStaticVehicleEx(416,-2706.2029,590.4933,14.6021,270.0135,1,3,900); // Ambulance 5
 	ambu[6] = AddStaticVehicleEx(416,-2706.2490,595.5879,14.6025,270.1201,1,3,900); // Ambulance 6
-	ambu[7] = AddStaticVehicleEx(487,-2703.4836,622.4868,14.6662,176.4144,1,3,900); // Medic Maverick 0
+	ambu[7] = AddStaticVehicle(487,-2585.69921875,586.29998779,14.69999981,270.00000000,1,3); // Medic Maverick 0
 	///////////////////////////////МУСОРОВОЗЫ///////////////////////////////////
 	trashtruck[0] = AddStaticVehicleEx(408,2190.7651,-1986.2179,14.1153,50.4807,-1,-1,300); // мусоровоз 265
 	AddStaticVehicleEx(408,2190.5078,-1990.8691,14.1142,49.4819,-1,-1,300); // мусоровоз 266
