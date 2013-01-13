@@ -777,7 +777,7 @@ forward LockCar(carid);
 forward CheckStatus(playerid);
 forward UnLockCar(carid);
 forward OnPlayerConnect(playerid);
-forward ReklamaTimer();
+forward ReklamaTimer(playerid);
 forward ShowStats(playerid,targetid);
 forward OnPropUpdate();
 forward SaveHomeSbizz();
@@ -1235,7 +1235,8 @@ new Text:Status;//Переменная текстдрава со словом Status
 new Text:StatusShow[MAX_PLAYERS];//Переменная текстдрава показывающая status авто(отдельна для каждого игрока)
 new Text:KMShow[MAX_PLAYERS];//Переменная текстдрава показывающая status авто(отдельна для каждого игрока)
 new Text:Fill[MAX_PLAYERS];//
-new str1[64],str2[64],str3[64],str5[64],str4[64];
+new Text:MaxShow[MAX_PLAYERS];///////////////////Advanced Role Play///////////////////////////
+new str1[64],str2[64],str3[64],str5[64],str4[64],str6[10];
 new Float:Fuell[MAX_VEHICLES], Refueling[MAX_PLAYERS], OldFuel[MAX_PLAYERS];
 new Text:URL[MAX_PLAYERS];
 //new Text:forum[MAX_PLAYERS];
@@ -37693,6 +37694,29 @@ else if(strcmp(cmd, "/government", true) == 0 || strcmp(cmd, "/gov", true) == 0)
 			}
 		return 1;
 	}
+		else if(strcmp(cmd, "/ogran", true) == 0)
+	{
+		if(PlayerInfo[playerid][pAdmin] >= 1)
+		{
+			tmp = strtok(cmdtext, idx);
+			if(!strlen(tmp)) return	SendClientMessage(playerid, COLOR_WHITE, " {DDA0DD} >> Введите{FFFFFF}: /ogran [id]");
+			new playa;
+			playa = ReturnUser(tmp);
+			if (PlayerInfo[playerid][pAdmin] >= 1)
+			{
+				if(IsPlayerConnected(playa))
+				{
+					PlayerInfo[playa][pOgran] = 0;
+					SendClientMessage(playa, COLOR_BLUE, "Админ снял вам огран!");
+				}
+			}
+			else
+			{
+				SendClientMessage(playerid, COLOR_GRAD1, "Вы не уполномочены использовать эту команду!");
+			}
+		}
+		return true;
+	}
 	 if(strcmp(cmd,"/block",true)==0)
         {
             if(IsPlayerConnected(playerid))
@@ -47412,7 +47436,6 @@ else if(strcmp(cmdtext, "/sellprodz", true) == 0)
         litr = strval(tmp);
 	if(PlayerInfo[i][pJob] == 2 && PlayerInfo[i][pMember] == 0)
 		{
-		new Veh = GetPlayerVehicleID(playerid);
 new fueldel = floatround(SBizzInfo[b][sbPriceProd] / 200.0);
             if(SBizzInfo[b][sbProducts] <= litr) return SendClientMessage(i,COLOR_GRAD1,"На заправке нет топлива");
 			if(PlayerInfo[i][pCash] < (SBizzInfo[b][sbPriceProd]/200)*litr) return SendClientMessage(i,COLOR_GRAD1,"Не достаточно денег!");
@@ -56302,7 +56325,6 @@ else if(strcmp(cmd, "/changehouse", true) == 0)
 	else if(strcmp(cmd, "/setrepair", true) == 0)
 	{
 		new money;
-    new Veh = GetPlayerVehicleID(playerid);
 		if(PlayerInfo[playerid][pJob] != 2) return SendClientMessage(playerid, COLOR_GREY, "Вы не механик!");
 		tmp = strtok(cmdtext, idx);
 		if(!strlen(tmp)) return	SendClientMessage(playerid, COLOR_GRAD2, "Введите: /setrepair [цена]");
@@ -57576,29 +57598,33 @@ public Ddchat()
 	dchat=1;
 	return 1;
 }
-public ReklamaTimer()
+public ReklamaTimer(playerid)
 {
-	new countvezitstr[128];
-	new mtext[20];
-	new year, month,day;
-	getdate(year, month, day);
-	if(month == 1) { mtext = "Января"; }
-	else if(month == 2) { mtext = "февраля"; }
-	else if(month == 3) { mtext = "Марта"; }
-	else if(month == 4) { mtext = "Апреля"; }
-	else if(month == 5) { mtext = "Мая"; }
-	else if(month == 6) { mtext = "Июня"; }
-	else if(month == 7) { mtext = "Июля"; }
-	else if(month == 8) { mtext = "Августа"; }
-	else if(month == 9) { mtext = "Сентября"; }
-	else if(month == 10) { mtext = "Октября"; }
-	else if(month == 11) { mtext = "Ноября"; }
-	else if(month == 12) { mtext = "Декабря"; }
-	SendClientMessageToAll(COLOR_GREEN,"{EE9A00}••••••••••••••••••••••••••••••••••••••••••••••[ Объявления ]••••••••••••••••••••••••••••••••••••••••••••••");
-	format(countvezitstr, sizeof(countvezitstr), "{ff0000}•{EE9A00}Статистика посещаемости сервера: за {00a86b}%d %s {EE9A00}игроки посетили сервер {00a86b}%d {EE9A00}раз", day, mtext, CountVezit);
-	OOCOff(COLOR_REDD,countvezitstr);
-	SendClientMessageToAll(COLOR_GREEN,"{FFFFFF}•{EE9A00}Единое меню игры - /mm");
-	SendClientMessageToAll(COLOR_GREEN,"{0000ff}•{EE9A00}Role Play Server Мечта");
+{
+	SendClientMessageToAll(COLOR_GREEN,"{32FCA8}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{ffffff} [ Объявление ] {32FCA8}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	SendClientMessageToAll(COLOR_GREEN,"{32FCA8}» {F0F5F3}Единое меню игры - /mm");
+	SendClientMessageToAll(COLOR_GREEN,"{32FCA8}» {F0F5F3}Role Play Server Мечта");
+	SendClientMessageToAll(COLOR_LIGHTGREEN,"{32FCA8}» {F0F5F3}Незабывайте посещать наш сайт: http://Dream-rp.pp.ua");
+	SendClientMessageToAll(COLOR_LIGHTGREEN,"{32FCA8}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+}
+	if(IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)//
+	{
+		new Float: carhp;//Создаем переменую жизни авто
+		new vehicleid = GetPlayerVehicleID(playerid);
+		GetVehicleHealth(vehicleid, carhp);
+		if(GetPlayerVehicleID(playerid) == caridhouse[playerid] || GetPlayerVehicleID(playerid))
+		{
+			if(carhp > 800 && carhp <= 1000)//Хп тачи
+			{
+				if(PlayerInfo[playerid][pOgran] != 0)
+				{
+					SendClientMessage(playerid,COLOR_GREEN,"Ваш навык вождения повышен! Теперь вы можете ехать быстрее!");
+					PlayerInfo[playerid][pOgran] = 0;
+				}
+			}
+		}
+	}
+	return true;
 }
 AntiDeAMX()
 {
@@ -60821,8 +60847,9 @@ public UpdateSpeedometr(playerid)//обновляем каждую секунду наш текстдрав
         new vehicleid;
         vehicleid = GetPlayerVehicleID(playerid);
         new locked[32];
-        new maxx[15];
-        if(Max(playerid) == 1) { maxx = "~b~Min"; } else { maxx = "~R~Max"; }
+		new maxx[7];
+		if(PlayerInfo[playerid][pOgran] >= 1){maxx = "~R~Max";}
+		else{maxx = "~l~Max";}
         if(IsLocked[GetPlayerVehicleID(playerid)] == 1)
         {
         locked = "~r~~h~Lock";
@@ -60838,6 +60865,7 @@ public UpdateSpeedometr(playerid)//обновляем каждую секунду наш текстдрав
         else if(Fuell[vehicleid] <= 300)  format(str2, sizeof(str2),"~g~%.0f",Fuell[vehicleid]);
         format(str5, sizeof(str5), "%s",locked);
         format(str3, sizeof(str3), "KM/H");
+		format(str6, sizeof(str6), "%s",maxx);
     if (PlayerInfo[playerid][pAdmin] >= 2) { } else
     {
         if(SpeedVehicle(playerid) >= 150)
@@ -60847,24 +60875,24 @@ public UpdateSpeedometr(playerid)//обновляем каждую секунду наш текстдрав
             Kick(playerid);
         }
         }
+        if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER && PlayerInfo[playerid][pOgran] >= 1)
+		{
+			#define MAX_SPEEDO 0.5 // Максимально допустимая скорость.
+			#define SLOW_FACTOR 0.8 // На сколько будет сбавляться скорость
+			new Float:x,Float:y,Float:z,veh;
+			veh = GetPlayerVehicleID(playerid);
+			GetVehicleVelocity(veh,x,y,z);
+			if((x > MAX_SPEEDO || x < -MAX_SPEEDO) || (y > MAX_SPEEDO || y < -MAX_SPEEDO))
+			{
+				SetVehicleVelocity(veh,x*SLOW_FACTOR,y*SLOW_FACTOR,z);
+			}
+		}
         if(SpeedVehicle(playerid) !=0)
         {
             Fuell[vehicleid] -= 0.003;
             if(GetPlayerVehicleID(playerid) == caridhouse[playerid])
             {
                 PlayerInfo[playerid][pFuelcar] -= 0.003;
-            }
-        }
-                new carid = GetPlayerVehicleID(playerid);
-        if(SuperGt(carid))
-        {
-            if(SpeedVehicle(playerid) !=0)
-            {
-                Fuell[vehicleid] -= 0.002;
-                if(GetPlayerVehicleID(playerid) == caridhouse[playerid])
-                {
-                    PlayerInfo[playerid][pFuelcar] -=0.002;
-                }
             }
         }
 	if(Fuell[vehicleid] < 0)
@@ -60880,6 +60908,7 @@ return true;
         TextDrawSetString(StatusShow[playerid],str5);
         TextDrawSetString(KMShow[playerid],str3);
         TextDrawSetString(Fill[playerid],str4);
+		TextDrawSetString(MaxShow[playerid],str6);
     }
     return 1;
     }
@@ -61001,6 +61030,19 @@ if(GetPlayerVehicleID(playerid) == caridhouse[playerid])
 			}
 			}
 	    }
+		if(GetPlayerVehicleID(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+		{
+			if(carhp > 500 && carhp < 700)
+			{
+				if(PlayerInfo[playerid][pOgran] <= 0)
+				{
+					PlayerInfo[playerid][pOgran] = 1;
+					SendClientMessage(playerid,COLOR_RED,"Ваш навык вождения понижен! Соблюдайте /pdd для его повышения!");
+					return false;
+				}
+				return false;
+			}
+		}
 	}
     return 1;
 }
