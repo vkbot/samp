@@ -2258,6 +2258,7 @@ enum pInfo
 	pJailed,
 	pCheat,
 	pJailTime,
+	pJail,
 	pDrugs,
 	pFerma,
     pFermazarobotok,
@@ -4211,6 +4212,7 @@ TextDrawHideForPlayer(playerid,Box);
     TextDrawHideForPlayer(playerid,Status);
     TextDrawHideForPlayer(playerid,StatusShow[playerid]);
     TextDrawHideForPlayer(playerid,KMShow[playerid]);
+	TextDrawHideForPlayer(playerid,MaxShow[playerid]);
     TextDrawHideForPlayer(playerid,Fill[playerid]);
 	HotdogOffer[playerid] = 999;
 	HotdogPrice[playerid] = 999;
@@ -4269,6 +4271,13 @@ STimer[playerid] = SetTimerEx("UpdateSpeedometr", Update, 1, "d", playerid); // 
     TextDrawSetOutline(FuelShow[playerid], 1);//размер обводки
     TextDrawSetProportional(FuelShow[playerid],1);
 
+	/************************************************************************************************************************/
+	MaxShow[playerid] = TextDrawCreate(403.000000,422.000000, "_");//сам Text Draw MAX/MIN
+	TextDrawBackgroundColor(MaxShow[playerid], 0);//обводка текста
+	TextDrawLetterSize(MaxShow[playerid],0.250000,1);//размер текста
+	TextDrawFont(MaxShow[playerid], 2);//стиль
+	TextDrawColor(MaxShow[playerid], COLOR_GREEN);//цвет текста
+	
     Fill[playerid] = TextDrawCreate(487.000000, 396.000000, "_");
     TextDrawBackgroundColor(Fill[playerid], 255);
     TextDrawFont(Fill[playerid], 2);
@@ -4435,6 +4444,7 @@ STimer[playerid] = SetTimerEx("UpdateSpeedometr", Update, 1, "d", playerid); // 
 	PlayerInfo[playerid][pJailed] = 0;
 	PlayerInfo[playerid][pCheat] = 0;
 	PlayerInfo[playerid][pJailTime] = 0;
+	PlayerInfo[playerid][pJail] = 0;
 	PlayerInfo[playerid][pDrugs] = 0;
 	PlayerInfo[playerid][pLeader] = 0;
 	PlayerInfo[playerid][pMember] = 0;
@@ -4721,7 +4731,7 @@ strdel(inputtext,strfind(inputtext,"%",true),strfind(inputtext,"%",true)+2);
 	}
 	toplivo[playerid] -= 10;
     format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d вирт>>",toplivo,cenabenzameh[playerid]);
-	Update3DTextLabelText(Meh3d[i], COLOR_LIGHTRED, string);
+	Update3DTextLabelText(Meh3d[playerid], COLOR_LIGHTRED, string);
 	return true;
 	}
 	}
@@ -17569,11 +17579,12 @@ Pursiut[playerid] = -1;
 	 enterbiz[playerid] = 0;
 	 KillTimer(Timerkk[playerid]);
 	 TextDrawDestroy(URL[playerid]);
-TextDrawDestroy(forum[playerid]);
-TextDrawDestroy(SpeedShow[playerid]);
+     TextDrawDestroy(forum[playerid]);
+    TextDrawDestroy(SpeedShow[playerid]);
     TextDrawDestroy(FuelShow[playerid]);
     TextDrawDestroy(StatusShow[playerid]);
     TextDrawDestroy(KMShow[playerid]);
+	TextDrawDestroy(MaxShow[playerid]);
     TextDrawDestroy(Fill[playerid]);
 	PlayerInfo[playerid][pHealth] = PlayerInfo[playerid][pHealth];
 	KillTimer(STimer[playerid]);
@@ -23327,6 +23338,7 @@ TextDrawShowForPlayer(playerid,Box);
                 TextDrawShowForPlayer(playerid,Status);
                 TextDrawShowForPlayer(playerid,StatusShow[playerid]);
                 TextDrawShowForPlayer(playerid,KMShow[playerid]);
+		    	TextDrawShowForPlayer(playerid,MaxShow[playerid]);
                 TextDrawShowForPlayer(playerid,Fill[playerid]);
 	}
 	}
@@ -23341,6 +23353,7 @@ TextDrawShowForPlayer(playerid,Box);
         TextDrawHideForPlayer(playerid,Status);
         TextDrawHideForPlayer(playerid,StatusShow[playerid]);
         TextDrawHideForPlayer(playerid,KMShow[playerid]);
+		TextDrawHideForPlayer(playerid,MaxShow[playerid]);
         TextDrawHideForPlayer(playerid,Fill[playerid]);
     }
 if(newstate == PLAYER_STATE_DRIVER)
@@ -24855,8 +24868,13 @@ if ((tmphour > ghour) || (tmphour == 0 && ghour == 23))
 				if(PlayerInfo[i][pJailTime] > 0)
 				{
 					PlayerInfo[i][pJailTime]--;
+				}if(PlayerInfo[i][pJail] > 0)
+				{
+					PlayerInfo[i][pJail]--;
 				}
 				if(PlayerInfo[i][pJailTime] <= 0)
+				{
+				if(PlayerInfo[i][pJail] <= 0)
 				{
 				if(PlayerInfo[i][pJailed] == 1)
 					{
@@ -24879,12 +24897,14 @@ if ((tmphour > ghour) || (tmphour == 0 && ghour == 23))
 						SetPlayerFacingAngle(i, 115.7874);
 						}
 					}
+					}
 					else if(PlayerInfo[i][pJailed] == 4)
 					{
 					    SetSpawnInfo(i, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0);
 						SpawnPlayer(i);
 					}
 					PlayerInfo[i][pJailTime] = 0;
+					PlayerInfo[i][pJail] = 0;
 					PlayerInfo[i][pJailed] = 0;
 					SendClientMessage(i, COLOR_ISPOLZUY,"Вы заплатили свой долг обществу, теперь вы свободны!");
 					PlayerInfo[i][pMestoJail] = 0;
@@ -26757,7 +26777,7 @@ CreateObject(6046, 1304.42, -1750.65, 13.37,   0.00, 0.00, 180.00);
 	//----------------------------[ Таймеры ]----------------------------------------------------------------------------------
 	synctimer = SetTimer("SyncUp", 60000, 1);
 	unjailtimer = SetTimer("SetPlayerUnjail", 1000, 1);
-	reklamatimer = SetTimer("ReklamaTimer",900000,1);
+	reklamatimer = SetTimer("ReklamaTimer",400000,1);
 //	CheckCheatersTimer = SetTimer("CheckCheaters", 5000, 1);// 112
 	SetTimer("Fresh",1000,1);
 	othtimer = SetTimer("OtherTimer", 3000, 1);
@@ -28093,6 +28113,7 @@ ini_setInteger(File,"Helper",PlayerInfo[playerid][pHelper]);//
 				ini_setInteger(File,"Jailed",PlayerInfo[playerid][pJailed]);
 				ini_setInteger(File,"Cheat",PlayerInfo[playerid][pCheat]);
 				ini_setInteger(File,"JailTime",PlayerInfo[playerid][pJailTime]);
+				ini_setInteger(File,"Jail",PlayerInfo[playerid][pJail]);
 				ini_setInteger(File,"Materials",PlayerInfo[playerid][pMats]);
 				ini_setInteger(File,"Drugs",PlayerInfo[playerid][pDrugs]);
 				ini_setInteger(File,"Leader",PlayerInfo[playerid][pLeader]);
@@ -28260,6 +28281,7 @@ public SavessAkk(playerid,string3[])
 			        ini_setInteger(File,"Jailed",PlayerInfo[playerid][pJailed]);
 			        ini_setInteger(File,"Cheat",PlayerInfo[playerid][pCheat]);
 			        ini_setInteger(File,"JailTime",PlayerInfo[playerid][pJailTime]);
+			    	ini_setInteger(File,"Jail",PlayerInfo[playerid][pJail]);
 			        ini_setInteger(File,"Materials",PlayerInfo[playerid][pMats]);
 			        ini_setInteger(File,"Drugs",PlayerInfo[playerid][pDrugs]);
 			        ini_setInteger(File,"Leader",PlayerInfo[playerid][pLeader]);
@@ -28466,6 +28488,7 @@ public OnPlayerLogin(playerid,password[])
 			        ini_getInteger(File,"Jailed",PlayerInfo[playerid][pJailed]);
 			        ini_getInteger(File,"Cheat",PlayerInfo[playerid][pCheat]);
 			        ini_getInteger(File,"JailTime",PlayerInfo[playerid][pJailTime]);
+			        ini_getInteger(File,"Jail",PlayerInfo[playerid][pJail]);
 			        ini_getInteger(File,"Materials",PlayerInfo[playerid][pMats]);
 			        ini_getInteger(File,"Drugs",PlayerInfo[playerid][pDrugs]);
 			        ini_getInteger(File,"Leader",PlayerInfo[playerid][pLeader]);
@@ -37728,10 +37751,10 @@ else if(strcmp(cmd, "/government", true) == 0 || strcmp(cmd, "/gov", true) == 0)
                             new Float:x ,Float:y, Float:z, Float:a;
                             GetPlayerFacingAngle(playerid, a);
                             GetPlayerPos(playerid,x,y,z);
-                        block[0] = CreateObject(981,x,y,z-0.5,0,0,a);
+                        block[0] = CreateObject(981,x-0.5,y-0.5,z-0.5,0,0,a);
                         Blocks[playerid] = 1;
                         GetPlayerName(playerid, sendername, sizeof(sendername));
-                        format(string, sizeof(string), "* %s установил дорожный блок.", sendername);
+                        format(string, sizeof(string), "%s установил дорожный блок.", sendername);
                         ProxDetector(35.0, playerid, string, COLOR_PURPLE,COLOR_PURPLE,COLOR_PURPLE,COLOR_PURPLE,COLOR_PURPLE);
                     }
                     else if(Blocks[playerid] == 1)
@@ -37739,7 +37762,7 @@ else if(strcmp(cmd, "/government", true) == 0 || strcmp(cmd, "/gov", true) == 0)
                         DestroyObject(block[0]);
                         Blocks[playerid] = 0;
                         GetPlayerName(playerid, sendername, sizeof(sendername));
-                        format(string, sizeof(string), "* %s убрал дорожный блок", sendername);
+                        format(string, sizeof(string), "%s убрал дорожный блок", sendername);
                         ProxDetector(35.0, playerid, string, COLOR_PURPLE,COLOR_PURPLE,COLOR_PURPLE,COLOR_PURPLE,COLOR_PURPLE);
                     }
                 }
@@ -41191,12 +41214,28 @@ if(strcmp(cmd, "/time", true) == 0)
                 {
                     format(string, sizeof(string), "~r~Dream RP~n~~y~%d %s~n~~g~~w~%d:0%d", day, mtext, hour, minuite);
                 }
+                if (PlayerInfo[playerid][pJail] > 0)
+                {
+                    format(string, sizeof(string), "~r~Dream RP~n~~y~%d %s~n~~g~~w~%d:0%d~n~~w~Jail Time Left: %d sec", day, mtext, hour, minuite, PlayerInfo[playerid][pJail]-10);
+                }
+                else
+                {
+                    format(string, sizeof(string), "~r~Dream RP~n~~y~%d %s~n~~g~~w~%d:0%d", day, mtext, hour, minuite);
+                }
             }
             else
             {
                 if (PlayerInfo[playerid][pJailTime] > 0)
                 {
                     format(string, sizeof(string), "~r~Dream RP~n~~y~%d %s~n~~g~~w~%d:%d~n~~w~Jail Time Left: %d sec", day, mtext, hour, minuite, PlayerInfo[playerid][pJailTime]-10);
+                }
+                else
+                {
+                    format(string, sizeof(string), "~r~Dream RP~n~~y~%d %s~n~~g~~w~%d:%d", day, mtext, hour, minuite);
+                }
+                if (PlayerInfo[playerid][pJail] > 0)
+                {
+                    format(string, sizeof(string), "~r~Dream RP~n~~y~%d %s~n~~g~~w~%d:%d~n~~w~Jail Time Left: %d sec", day, mtext, hour, minuite, PlayerInfo[playerid][pJail]-10);
                 }
                 else
                 {
@@ -41607,7 +41646,7 @@ else if(strcmp(cmd, "/jail", true) == 0)
 					SetPlayerPos(playa,264.1425,77.4712,1001.0391);
 					SetPlayerFacingAngle(playa, 263.0160);
 					PlayerInfo[playa][pJailed] = 4;
-					PlayerInfo[playa][pJailTime] = money;
+					PlayerInfo[playa][pJail] = money;
 					format(string, sizeof(string), "Вы были посажены в тюрьму администратором на %d секунд(ы)", money);
 					SendClientMessage(playa, COLOR_LIGHTRED, string);
 				}
@@ -47450,15 +47489,15 @@ new fueldel = floatround(SBizzInfo[b][sbPriceProd] / 200.0);
 			toplivo[i] += litr;
 			cenabenzameh[i] = (SBizzInfo[b][sbPriceProd]/20)*3;
 			if(peremennaya[i] == 0){
-            format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d вирт>>",toplivo,cenabenzameh[i]);
-            Meh3d[i] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 40.0, 0, 1);
-            Attach3DTextLabelToVehicle(Meh3d[i], GetPlayerVehicleID(i), 0.0, 0.0, 2);
+            format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d вирт>>",toplivo,cenabenzameh[playerid]);
+            Meh3d[playerid] = Create3DTextLabel(string, COLOR_LIGHTRED, 0.0, 0.0, 0.0, 40.0, 0, 1);
+            Attach3DTextLabelToVehicle(Meh3d[playerid], GetPlayerVehicleID(playerid), 0.0, 0.0, 2);
             peremennaya[i] = 1;
 			return 1;
 			}
 			else {
     format(string, 90, "{FF0000}<< Запас топлива: %d литров >>\n<< Цена 10 литров: %d вирт>>",toplivo,cenabenzameh[playerid]);
-	Update3DTextLabelText(Meh3d[i], COLOR_LIGHTRED, string);
+	Update3DTextLabelText(Meh3d[playerid], COLOR_LIGHTRED, string);
 	return 1;
 			}
 			}
@@ -60903,6 +60942,15 @@ public UpdateSpeedometr(playerid)//обновляем каждую секунду наш текстдрав
            SetVehicleParamsEx(GetPlayerVehicleID(playerid) ,VEHICLE_PARAMS_OFF,VEHICLE_PARAMS_OFF,alarm,doors,bonnet,boot,objective);
 return true;
    }
+   new Float: carhp;//Создаем переменую жизни авто
+	GetVehicleHealth(vehicleid, carhp);
+    if(carhp < 300)
+    {
+    zavodis[playerid] = 0;
+    GetVehicleParamsEx(GetPlayerVehicleID(playerid),engine,lights,alarm,doors,bonnet,boot,objective);
+           SetVehicleParamsEx(GetPlayerVehicleID(playerid) ,VEHICLE_PARAMS_OFF,VEHICLE_PARAMS_OFF,alarm,doors,bonnet,boot,objective);
+return true;
+   }
         TextDrawSetString(SpeedShow[playerid],str1);
         TextDrawSetString(FuelShow[playerid],str2);
         TextDrawSetString(StatusShow[playerid],str5);
@@ -61020,6 +61068,16 @@ if(GetPlayerVehicleID(playerid) == caridhouse[playerid])
 			    PlayerInfo[playerid][pProz] -= 1;
 			    return 1;
 			}
+			else if(carhp > 400 && carhp < 500)
+            {
+                if(PlayerInfo[playerid][pOgran] <= 0)
+                {
+                        PlayerInfo[playerid][pOgran] += 1;
+                        SendClientMessage(playerid,COLOR_RED,"Ваш навык вождения понижен! Соблюдайте /pdd для его повышения!");
+                        return 0;
+                }
+                return 0;
+            }
 			else if(carhp > 200 && carhp < 500) // дымит
 			{
    			if(PlayerInfo[playerid][pProz] > 0)
@@ -61030,19 +61088,6 @@ if(GetPlayerVehicleID(playerid) == caridhouse[playerid])
 			}
 			}
 	    }
-		if(GetPlayerVehicleID(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
-		{
-			if(carhp > 500 && carhp < 700)
-			{
-				if(PlayerInfo[playerid][pOgran] <= 0)
-				{
-					PlayerInfo[playerid][pOgran] = 1;
-					SendClientMessage(playerid,COLOR_RED,"Ваш навык вождения понижен! Соблюдайте /pdd для его повышения!");
-					return false;
-				}
-				return false;
-			}
-		}
 	}
     return 1;
 }
